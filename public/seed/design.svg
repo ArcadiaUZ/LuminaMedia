@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#38bdf8"/>
+  </linearGradient></defs>
+  <rect width="640" height="360" fill="url(#g)"/>
+  <circle cx="540" cy="60" r="120" fill="rgba(255,255,255,0.12)"/>
+  <circle cx="60" cy="300" r="90" fill="rgba(0,0,0,0.18)"/>
+  <text x="32" y="300" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#fff">Design</text>
+  <text x="32" y="334" font-family="Arial, sans-serif" font-size="18" font-weight="500" fill="rgba(255,255,255,0.8)">Lumina · Design</text>
+</svg>

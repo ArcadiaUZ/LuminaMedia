@@ -1,0 +1,703 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --color-void: #08080d;
+  --color-base: #0c0c13;
+  --color-surface: #13131c;
+  --color-elevated: #1b1b27;
+  --color-overlay: #232331;
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-strong: rgba(255, 255, 255, 0.14);
+  --color-ink: #f4f4f6;
+  --color-muted: #a2a2b3;
+  --color-faint: #6b6b7d;
+  --color-iris: #7c5cff;
+  --color-iris-soft: #9d86ff;
+  --color-mint: #34d399;
+  --color-amber: #fbbf24;
+  --color-rose: #fb7185;
+
+  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --shadow-pop: 0 18px 60px rgba(0, 0, 0, 0.55);
+
+  --radius-xl2: 1.25rem;
+
+  /* — liquid glass material tokens — */
+  --glass-blur: 26px;
+  --glass-blur-soft: 18px;
+  --glass-saturation: 150%;
+  --glass-border: rgba(255, 255, 255, 0.11);
+  --glass-border-strong: rgba(255, 255, 255, 0.18);
+  --glass-highlight: rgba(255, 255, 255, 0.16);
+  --glass-shadow: rgba(0, 0, 0, 0.34);
+
+  /* — motion tokens — */
+  --ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --motion-fast: 160ms;
+  --motion-normal: 280ms;
+  --motion-slow: 460ms;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* match overscroll/bounce area to the page so no band appears at page end */
+html {
+  background: var(--color-void);
+}
+
+body {
+  background: var(--color-base);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  /* clip — hidden'dan farqli o'laroq scroll-container yaratmaydi,
+     shuning uchun fixed pastki dock (MobileNav) sahifa kalta/uzunligidan
+     qat'i nazar viewport'ga nisbatan bir joyda turadi */
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+/* Dinamik mobil viewport: brauzer paneli yig'ilganda/ochilganda
+   100vh sakramaydi — dock har doim bir xil joyda qoladi */
+@supports (min-height: 100dvh) {
+  .app-shell-min {
+    min-height: 100dvh;
+  }
+}
+
+/* ============================================================
+   Liquid environment — deep cinematic backdrop
+   ============================================================ */
+.app-bg {
+  background:
+    radial-gradient(1200px 520px at 12% -12%, rgba(124, 92, 255, 0.22), transparent 60%),
+    radial-gradient(1000px 460px at 88% 4%, rgba(52, 211, 153, 0.1), transparent 62%),
+    radial-gradient(900px 700px at 50% 118%, rgba(251, 113, 133, 0.06), transparent 65%),
+    var(--color-void);
+}
+
+.app-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(720px 460px at 50% 0%, black, transparent 78%);
+  opacity: 0.5;
+}
+
+::selection {
+  background: rgba(124, 92, 255, 0.45);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2c2c3a transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #2c2c3a;
+  border-radius: 99px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Scrollbar paydo bo'lib/yo'qolib viewport kengligi o'zgarganda markazlangan
+   elementlar (navbar search) chapga-o'ngga "yurib" ketmasligi uchun joy band qilinadi */
+html {
+  scrollbar-gutter: stable;
+}
+
+.card-hover {
+  transition: transform 0.35s var(--ease-fluid), box-shadow 0.35s var(--ease-fluid), border-color 0.25s, background 0.35s;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card);
+  border-color: var(--glass-border-strong);
+}
+
+/* Logo matni — mobil qidiruv ochilganda logo ikonkasi ichiga kirib ketadi.
+   Faqat mobil'da (desktop'da msearch-open hech qachon yoqilmaydi) */
+.logo-text {
+  display: inline-flex;
+  align-items: center;
+  max-width: 220px;
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    max-width 0.35s var(--ease-fluid),
+    opacity 0.25s ease,
+    transform 0.35s var(--ease-fluid);
+}
+@media (max-width: 767px) {
+  .msearch-open .logo-text {
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+
+/* Barcha tugma/link ikonkalariga jonli hover — ikonka biroz kattalashadi.
+   Transform bo'lgani uchun layout qimirlamaydi. Komponentdagi aniqroq
+   qoida (masalan sidebar scale-125) ustun keladi. */
+button svg.lucide,
+a svg.lucide {
+  transition: transform 0.3s var(--ease-fluid);
+}
+button:hover svg.lucide,
+a:hover svg.lucide {
+  transform: scale(1.18);
+}
+
+/* Profil dropdown (Profile/Settings/Sign out) ikonkalarida o'sish
+   globaldan 25% past: 1.18 → ~1.135. Faqat shu menyuga tegishli. */
+.user-menu a:hover svg.lucide,
+.user-menu button:hover svg.lucide {
+  transform: scale(1.135);
+}
+
+.img-zoom img {
+  transition: transform 0.6s var(--ease-fluid);
+}
+.img-zoom:hover img {
+  transform: scale(1.05);
+}
+
+.fade-up {
+  animation: fadeUp 0.4s var(--ease-fluid) both;
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.09) 50%, transparent 80%);
+  animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-iris);
+  outline-offset: 3px;
+  /* border-radius ataylab qo'yilmaydi — outline elementning o'z shakliga
+     (pill, rounded-2xl) ergashadi, to'rtburchak bo'lib chiqmaydi */
+}
+
+/* Sidebar nav uses its own active pill highlight — the global focus
+   ring would stack on top and look like a stray outline. Keep focus
+   accessible via the item's own state, but suppress the extra ring. */
+aside nav a:focus,
+aside nav a:focus-visible,
+aside nav button:focus,
+aside nav button:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+input[type="range"] {
+  accent-color: var(--color-iris);
+}
+
+/* ============================================================
+   Liquid glass material system
+   ============================================================ */
+@layer components {
+  .glass {
+    position: relative;
+    border: 1px solid var(--glass-border);
+    background:
+      linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+      0 18px 50px var(--glass-shadow);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  }
+
+  /* "clear" variant — very translucent, tuned for rich media backdrops */
+  .clear-glass {
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 14px 44px var(--glass-shadow);
+  }
+
+  /* lighter material for ordinary content containers */
+  .glass-min {
+    position: relative;
+    border: 1px solid var(--glass-border);
+    background:
+      linear-gradient(150deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 14px 40px rgba(0, 0, 0, 0.28);
+  }
+
+  /* elevated floating layer — popovers, modals, dropdowns */
+  .glass-pop {
+    position: relative;
+    border: 1px solid var(--glass-border-strong);
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.05));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+      0 28px 80px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  }
+
+  /* text-heavy floating layer — near-opaque body keeps text readable over
+     busy content, while edge light + shadow preserve the material feel */
+  .glass-pop-strong {
+    position: relative;
+    border: 1px solid var(--glass-border-strong);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 28%),
+      linear-gradient(180deg, rgba(27, 27, 38, 0.97), rgba(14, 14, 21, 0.96));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+      0 28px 80px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  }
+
+  /* bottom dock — fully transparent container: no blur, no border,
+     no shadow, no tint. Only the buttons themselves are visible, so no
+     edge or tone difference can ever form against the background. */
+  .glass-dock {
+    position: relative;
+    border: 1px solid transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  /* transparent input field material */
+  .glass-field {
+    border: 1px solid var(--glass-border);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(var(--glass-blur-soft)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur-soft)) saturate(var(--glass-saturation));
+  }
+
+  /* specular highlight that follows the pointer (set --px / --py) */
+  .glass-sheen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      260px 200px at var(--px, 30%) var(--py, 0%),
+      rgba(255, 255, 255, 0.18),
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-fluid);
+  }
+  .glass-sheen:hover::before {
+    opacity: 1;
+  }
+
+  /* soft inner edge ring for depth */
+  .glass-edge::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  /* translucent catch-light pill (active nav / selected) */
+  .glass-pill {
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.72));
+    box-shadow:
+      0 6px 20px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .glass-chip {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(var(--glass-blur-soft)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur-soft)) saturate(var(--glass-saturation));
+    transition: background 0.25s, border-color 0.25s, transform 0.18s var(--ease-spring);
+  }
+  .glass-chip:hover {
+    border-color: var(--glass-border-strong);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+  }
+  .glass-chip:active {
+    transform: scale(0.96);
+  }
+
+  /* shimmering glass placeholder for loading states */
+  .glass-skeleton {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  }
+  .glass-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 25%, rgba(255, 255, 255, 0.08) 50%, transparent 75%);
+    animation: shimmer 1.8s infinite;
+  }
+}
+
+/* — optical highlight on ambient orbs / bubbles (decorative) — */
+.orb {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(56px);
+  will-change: transform;
+}
+.bubble {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    radial-gradient(120% 120% at 30% 22%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.02) 55%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.35),
+    0 10px 30px rgba(0, 0, 0, 0.25);
+  will-change: transform;
+}
+
+@keyframes orbFloat {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(4rem, -2.5rem, 0) scale(1.06);
+  }
+  66% {
+    transform: translate3d(-2.5rem, 2rem, 0) scale(0.97);
+  }
+}
+@keyframes bubbleRise {
+  0% {
+    transform: translate3d(0, 30px, 0) scale(0.94);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate3d(var(--drift, 10px), -40px, 0) scale(1);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(calc(var(--drift, 10px) * -0.6), -200px, 0) scale(1.04);
+    opacity: 0;
+  }
+}
+
+/* coarse glass gradient used behind floating nav/sidebar.
+   Ataylab bir xil va yetarlicha zich — orqa fondagi orb'lar har joyda
+   har xil o'tib navbar bilan sidebar rangi farq qilayotgandek ko'rinmasligi uchun */
+.glass-nav {
+  background: linear-gradient(180deg, rgba(20, 20, 30, 0.55), rgba(16, 16, 25, 0.45));
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+}
+
+/* mobile: smaller blur radii + calmer orbs — huge blurs tile badly on
+   mobile GPUs and can leave visible seams when scrolled to page end */
+@media (max-width: 767px) {
+  .orb {
+    filter: blur(36px);
+    opacity: 0.8;
+  }
+  /* flat uniform background on phones: gradient steps can read as
+     visible bands on small bright screens, so use pure void */
+  .app-bg {
+    background: var(--color-void);
+  }
+  .app-bg::before {
+    display: none;
+  }
+}
+
+/* content layer sits above the liquid environment */
+.app-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* YouTube-style double-tap seek feedback */
+@keyframes seekFlash {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+.seek-flash {
+  animation: seekFlash 0.75s var(--ease-fluid) both;
+}
+@keyframes seekPing {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+.seek-ping {
+  animation: seekPing 0.75s ease-out both;
+}
+
+/* — accessible glass: keep legibility without backdrop bushes — */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass-pop,
+  .glass-pop-strong,
+  .glass-field {
+    background: rgba(19, 19, 28, 0.92);
+  }
+  .glass-min {
+    background: rgba(19, 19, 28, 0.88);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble {
+    animation: none;
+    opacity: 0;
+  }
+  .orb {
+    animation: none;
+  }
+  .skeleton-shimmer::after,
+  .glass-skeleton::after {
+    animation: none;
+  }
+  .seek-flash,
+  .seek-ping {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-pop,
+  .glass-pop-strong,
+  .glass-field,
+  .glass-min,
+  .glass-nav {
+    --glass-blur: 0px;
+    --glass-saturation: 100%;
+    background: rgba(19, 19, 28, 0.96);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* ============================================================
+   Theme tokens — dark (default) + light.
+   Komponentlar to'g'ridan-to'g'ri hex o'rniga shu o'zgaruvchilarni
+   ishlatadi: text-(--tx1..4), bg-[rgb(var(--tint)/x)],
+   border-[rgb(var(--tint)/x)]. html.light'da qiymatlar almashadi.
+   ============================================================ */
+:root,
+:root.dark {
+  --tx1: #ffffff;
+  --tx2: #dcdce6;
+  --tx3: #a2a2b3;
+  --tx4: #6b6b7d;
+  --tx-danger: #fda4af;
+  --tint: 255 255 255;
+  --bg0: #08080d;
+  color-scheme: dark;
+}
+
+:root.light {
+  --tx1: #17171f;
+  --tx2: #41414d;
+  --tx3: #62626e;
+  --tx4: #8f8f9a;
+  --tx-danger: #e11d48;
+  --tint: 24 24 34;
+  --bg0: #e9ecf4;
+  color-scheme: light;
+
+  --color-void: #e9ecf4;
+  --color-base: #f4f5fa;
+  --color-surface: #ffffff;
+  --color-elevated: #ffffff;
+  --color-overlay: #e8eaf2;
+  --color-ink: #17171f;
+  --color-muted: #62626e;
+  --color-faint: #8f8f9a;
+  --glass-border: rgba(23, 23, 31, 0.1);
+  --glass-border-strong: rgba(23, 23, 31, 0.17);
+  --glass-highlight: rgba(255, 255, 255, 0.6);
+  --glass-shadow: rgba(35, 40, 80, 0.13);
+  --shadow-card: 0 8px 30px rgba(35, 40, 80, 0.12);
+  --shadow-pop: 0 18px 60px rgba(35, 40, 80, 0.18);
+}
+
+/* — light material: oq shisha (dark'dagi kabi liquid, faqat yorug') — */
+.light .glass {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.55));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.3),
+    0 18px 50px var(--glass-shadow);
+}
+.light .clear-glass {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
+}
+.light .glass-min {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.44));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 14px 40px rgba(35, 40, 80, 0.1);
+}
+.light .glass-pop {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.68));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4),
+    0 28px 80px rgba(35, 40, 80, 0.22);
+}
+.light .glass-pop-strong {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.12) 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(240, 241, 247, 0.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 28px 80px rgba(35, 40, 80, 0.25);
+}
+.light .glass-nav {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.45));
+}
+.light .glass-chip {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.38));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+.light .glass-chip:hover {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.5));
+}
+.light .glass-field {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.48));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+/* glass-pill har ikki themeda ham ochiq — ustidagi to'q yozuv o'zgarmaydi */
+.light .glass-edge::after {
+  box-shadow: inset 0 0 0 1px rgba(23, 23, 32, 0.07);
+}
+.light .glass-skeleton {
+  border-color: rgba(23, 23, 32, 0.07);
+  background: linear-gradient(150deg, rgba(23, 23, 32, 0.05), rgba(23, 23, 32, 0.02));
+}
+.light .glass-skeleton::after {
+  background: linear-gradient(100deg, transparent 25%, rgba(23, 23, 32, 0.08) 50%, transparent 75%);
+}
+.light .skeleton-shimmer {
+  background: linear-gradient(150deg, rgba(23, 23, 32, 0.06), rgba(23, 23, 32, 0.03));
+  border-color: rgba(23, 23, 32, 0.06);
+}
+.light .skeleton-shimmer::after {
+  background: linear-gradient(100deg, transparent 20%, rgba(23, 23, 32, 0.09) 50%, transparent 80%);
+}
+.light .app-bg {
+  background:
+    radial-gradient(1200px 520px at 12% -12%, rgba(124, 92, 255, 0.14), transparent 60%),
+    radial-gradient(1000px 460px at 88% 4%, rgba(52, 211, 153, 0.12), transparent 62%),
+    radial-gradient(900px 700px at 50% 118%, rgba(251, 113, 133, 0.08), transparent 65%),
+    var(--color-void);
+}
+.light .app-bg::before {
+  background-image: radial-gradient(rgba(23, 23, 40, 0.08) 1px, transparent 1px);
+  opacity: 0.6;
+}
+.light .orb {
+  opacity: 0.55;
+}
+.light .bubble {
+  border-color: rgba(23, 23, 40, 0.14);
+  background: radial-gradient(120% 120% at 30% 22%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.08) 55%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    0 10px 30px rgba(35, 40, 80, 0.12);
+}
+.light * {
+  scrollbar-color: #c3c7d4 transparent;
+}

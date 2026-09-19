@@ -1,0 +1,10 @@
+# GitHub: treat lockfiles and generated files as such in diffs
+package-lock.json linguist-generated=false
+*.svg text eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.mp4 binary
+*.webm binary
+*.mkv binary
+*.mov binary

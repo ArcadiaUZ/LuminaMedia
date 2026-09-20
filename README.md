@@ -90,3 +90,4 @@ public/uploads/     # local dev storage (git-ignored, Fly volume in prod)
 ## License
 
 MIT — see [LICENSE](LICENSE).
+"# LuminaMedia" 

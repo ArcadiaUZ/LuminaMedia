@@ -1,93 +1,92 @@
-# Lumina — Cinematic Media Platform
+# Lumina — Kinematik Media Platforma
 
-YouTube-style video platform: watch, chunked resumable upload (up to 2GB),
-channels, subscriptions, playlists, Watch Later / Liked / History,
-Creator Studio, admin panel with impersonation, 3-language UI (en/uz/ru).
+YouTube uslubidagi video platforma: tomosha qilish, bo'laklab yuklash (2GB gacha, davom ettirish imkoniyati bilan),
+kanallar, obunalar, pleylistlar, Keyin ko'rish / Yoqdi / Tarix,
+Ijodkor studiyasi, impersonatsiya funksiyali admin panel, 3 tilli interfeys (o'zbek / ingliz / rus).
 
-Built with **Next.js 16** (App Router, standalone output), **React 19**,
-**Prisma 6 + PostgreSQL**, **Tailwind CSS v4**, **zustand**, **zod**, **jose** (JWT).
+**Next.js 16** (App Router, standalone), **React 19**,
+**Prisma 6 + PostgreSQL**, **Tailwind CSS v4**, **zustand**, **zod**, **jose** (JWT) asosida qurilgan.
 
-## Quickstart (Windows / any OS)
+## Tezkor ishga tushirish (Windows / istalgan OT)
 
 ```bash
 npm ci
-cp .env.example .env   # fill in real values (see table below)
-node prisma/pg-dev.mjs --serve   # embedded dev Postgres (or point DATABASE_URL at your own)
+cp .env.example .env   # haqiqiy qiymatlarni kiriting (pastdagi jadvalga qarang)
+node prisma/pg-dev.mjs --serve   # ichki dev Postgres (yoki DATABASE_URL ni o'zingiznikiga yo'naltiring)
 npx prisma generate
 npx prisma migrate deploy
-npx prisma db seed      # optional demo content (demo@lumina.tv / password123 — dev only)
+npx prisma db seed      # ixtiyoriy demo kontent (demo@lumina.tv / password123 — faqat dev uchun)
 npm run dev             # http://localhost:3000
 ```
 
-Windows shortcut: `start.bat` (install → embedded Postgres → migrate → dev).
-Set `SEED_DEMO=1` before running it if you want demo content.
+Windows uchun: `start.bat` (o'rnatish → ichki Postgres → migratsiya → dev).
+Demo kontent kerak bo'lsa, ishga tushirishdan oldin `SEED_DEMO=1` ni o'rnating.
 
-## Environment
+## Muhit o'zgaruvchilari
 
-| Var | Required | Description |
+| O'zgaruvchi | Majburiy | Tavsif |
 |---|---|---|
-| `DATABASE_URL` | yes | PostgreSQL connection string |
-| `JWT_SECRET` | yes (prod) | Min 32 random chars. `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. App refuses to boot in production without it |
-| `NEXT_PUBLIC_APP_NAME` | no | Brand name in UI (default `Lumina`) |
-| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | yes (prod) | Admin panel (`/admin`) login. Set via `fly secrets set`, never commit |
-| `TRANSCODE_TIMEOUT_MS` | no | Background transcode guard |
-| `ALLOWED_DEV_ORIGINS` | no | Comma-separated LAN IPs allowed for dev HMR |
+| `DATABASE_URL` | ha | PostgreSQL ulanish satri |
+| `JWT_SECRET` | ha (prod) | Kamida 32 ta tasodifiy belgi. `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Prod'da usiz ilova ishga tushmaydi |
+| `NEXT_PUBLIC_APP_NAME` | yo'q | Interfeysdagi brend nomi (standart `Lumina`) |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | ha (prod) | Admin panel (`/admin`) logini. `fly secrets set` orqali o'rnating, hech qachon commit qilmang |
+| `TRANSCODE_TIMEOUT_MS` | yo'q | Fon transkoding himoyasi |
+| `ALLOWED_DEV_ORIGINS` | yo'q | Dev HMR uchun ruxsat etilgan LAN IP'lar (vergul bilan) |
 
-See `.env.example` for the template. `.env` is git-ignored — never commit it.
+Shablon uchun `.env.example` ga qarang. `.env` git'da kuzatilmaydi — uni hech qachon commit qilmang.
 
-## Scripts
+## Skriptlar
 
-| Script | Purpose |
+| Skript | Vazifasi |
 |---|---|
 | `npm run dev` | Dev server |
 | `npm run build` | `prisma generate && next build` |
-| `npm run start` | Prod server (local) |
+| `npm run start` | Prod server (lokal) |
 | `npm run lint` | `eslint .` |
 | `npm run db:migrate` | `prisma migrate deploy` |
 | `npm run db:generate` | `prisma generate` |
-| `npm run db:seed` | Demo seed (dev only) |
-| `npm run db:pg` | Embedded dev Postgres |
+| `npm run db:seed` | Demo seed (faqat dev) |
+| `npm run db:pg` | Ichki dev Postgres |
 
-## How upload works
+## Yuklash qanday ishlaydi
 
-1. Client splits files into 8MB chunks → `POST /api/upload/chunk`
-2. `GET /api/upload/chunk?uploadId=` reports received chunks (resume after refresh)
-3. `POST /api/upload/complete` assembles chunks to disk (streamed, size-capped at 2GB), validates MIME **and** extension, sanitizes file extension, cleans up orphan files if DB write fails
-4. Videos >1GB are queued for background compression (`src/lib/transcode.ts`)
+1. Klient fayllarni 8MB bo'laklarga bo'lib → `POST /api/upload/chunk` ga yuboradi
+2. `GET /api/upload/chunk?uploadId=` qabul qilingan bo'laklarni qaytaradi (sahifa yangilanganda davom ettirish)
+3. `POST /api/upload/complete` bo'laklarni diskda yig'adi (oqimli, 2GB limit), MIME **va** kengaytmani tekshiradi, kengaytmani tozalaydi, DB yozuvi muvaffaqiyatsiz bo'lsa yetim fayllarni o'chiradi
+4. 1GB dan katta videolar fon siqishga navbatga qo'yiladi (`src/lib/transcode.ts`)
 
 ## Deploy (Docker / Fly.io)
 
 ```bash
 docker build -t lumina .
 docker run -p 3000:3000 --env-file .env lumina
-fly deploy   # uses Dockerfile + fly.toml (volume lumina_uploads → /data)
+fly deploy   # Dockerfile + fly.toml ishlatadi (lumina_uploads volume → /data)
 ```
 
-Prod checklist: `fly secrets set JWT_SECRET=... ADMIN_USERNAME=... ADMIN_PASSWORD=... DATABASE_URL=...`,
-healthcheck path `/` (or add `/api/health`), Redis-backed rate limit for multi-instance
-(current `src/lib/ratelimit.ts` is in-memory).
+Prod ro'yxat: `fly secrets set JWT_SECRET=... ADMIN_USERNAME=... ADMIN_PASSWORD=... DATABASE_URL=...`,
+healthcheck yo'li `/` (yoki `/api/health` qo'shing), ko'p nusxali rejim uchun Redis'li rate limit
+(hozirgi `src/lib/ratelimit.ts` xotirada ishlaydi).
 
-## Project structure
+## Loyiha tuzilishi
 
 ```
-src/app/            # App Router pages + /api routes
+src/app/            # App Router sahifalar + /api yo'llar
 src/components/     # layout / video / ui
 src/lib/            # auth, admin, db, storage, transcode, validations, ratelimit
 src/store/          # zustand (auth, settings, locale, ui)
-src/i18n/           # en/uz/ru dictionaries
-prisma/             # schema.prisma, migrations, seed.ts, pg-dev.mjs
-public/uploads/     # local dev storage (git-ignored, Fly volume in prod)
+src/i18n/           # o'zbek / ingliz / rus lug'atlar
+prisma/             # schema.prisma, migratsiyalar, seed.ts, pg-dev.mjs
+public/uploads/     # lokal dev ombori (git'da kuzatilmaydi, prod'da Fly volume)
 ```
 
-## Security notes
+## Xavfsizlik eslatmalari
 
-- Session (`lumina_session`, 14d) and admin (`lumina_admin`, 12h) cookies are HS256 JWT, `httpOnly`, `SameSite=Lax`, `Secure` in prod
-- Admin impersonation cookie is a signed JWT (`role: impersonate`), not a raw user id
-- Upload validates MIME type **and** extension, allow-lists extensions (`.mp4/.webm/.ogg/.mov/.mkv`, thumbs `.jpg/.png/.webp`), caps stream size to prevent disk-fill
-- Auth/comment/like/subscribe/upload endpoints are rate-limited (in-memory; use Redis in prod multi-instance)
-- Never commit `.env`, `public/uploads/*`, `prisma/pgdata/`, `.next/` — all git-ignored
+- Sessiya (`lumina_session`, 14 kun) va admin (`lumina_admin`, 12 soat) cookielar HS256 JWT, `httpOnly`, `SameSite=Lax`, prod'da `Secure`
+- Admin impersonatsiya cookie imzolangan JWT (`role: impersonate`), xom user id emas
+- Yuklashda MIME tur **va** kengaytma tekshiriladi, ruxsat etilgan kengaytmalar (`.mp4/.webm/.ogg/.mov/.mkv`, prevyu `.jpg/.png/.webp`), disk to'lib ketmasligi uchun oqim hajmi cheklangan
+- Auth/izoh/like/obuna/yuklash endpoint'lar rate-limit'da (xotirada; prod multi-instance'da Redis ishlating)
+- `.env`, `public/uploads/*`, `prisma/pgdata/`, `.next/` ni hech qachon commit qilmang — barchasi git-ignored
 
-## License
+## Litsenziya
 
-MIT — see [LICENSE](LICENSE).
-"# LuminaMedia" 
+MIT — [LICENSE](LICENSE) ga qarang.

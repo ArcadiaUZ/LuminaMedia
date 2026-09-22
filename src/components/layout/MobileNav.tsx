@@ -33,9 +33,8 @@ export function MobileNav() {
   // /upload ga darhol o'tilgani uchun path o'zgarishi animatsiyani
   // o'chirmasligi kerak, aks holda raketa ucholmay qoladi.
   const reduceMotion = useReducedMotion();
-  // Hidden while watching a video — immersive playback, no overlap with
-  // the player or comment composer. Visible everywhere else.
-  if (path.startsWith("/watch/")) return null;
+  // Barcha sahifada bir xil: watch'da ham yashirilmaydi — immersive uchun
+  // player pastida yetarli joy (pb-40) bor, dock kontentni bosmaydi.
 
   const handleUpload = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (launching || path === "/upload") return;
@@ -58,13 +57,12 @@ export function MobileNav() {
   };
   return (
     // Tashqi o'ram fixed — hech qanday transform'siz markazlash, scroll'da qimirlamaydi.
-    // Pastdan safe-area + tayanch joy (min 28px) — Android gesture pill/home
-    // indicator bosmaydi, sahifa kalta (scroll yo'q) yoki uzunligidan qat'i nazar
-    // dock har doim skeleton holatidagi kabi bir xil balandlikda turadi.
+    // Pastdan safe-area + kichik tayanch joy (min 20px) — Android gesture pill/home
+    // indicator bosmaydi, barcha sahifada bir xil balandlikda turadi.
     <div
       className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-3 md:hidden"
       style={{
-        paddingBottom: "max(49px, calc(env(safe-area-inset-bottom, 0px) + 29px))",
+        paddingBottom: "max(20px, calc(env(safe-area-inset-bottom, 0px) + 12px))",
         paddingLeft: "max(12px, env(safe-area-inset-left, 0px))",
         paddingRight: "max(12px, env(safe-area-inset-right, 0px))",
       }}

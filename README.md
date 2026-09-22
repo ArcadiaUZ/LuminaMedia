@@ -1,5 +1,7 @@
 # Lumina — Kinematik Media Platforma
 
+🌐 **Jonli demo:** https://lumina-media.fly.dev/
+
 YouTube uslubidagi video platforma: tomosha qilish, bo'laklab yuklash (2GB gacha, davom ettirish imkoniyati bilan),
 kanallar, obunalar, pleylistlar, Keyin ko'rish / Yoqdi / Tarix,
 Ijodkor studiyasi, impersonatsiya funksiyali admin panel, 3 tilli interfeys (o'zbek / ingliz / rus).

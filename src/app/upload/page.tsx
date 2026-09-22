@@ -23,6 +23,8 @@ import {
 import { cn } from "@/lib/utils";
 import { useT } from "@/i18n/core";
 
+const UPLOAD_ENTER_KEY = "lumina:upload-enter";
+
 export default function UploadPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
@@ -45,6 +47,25 @@ export default function UploadPage() {
   const [drag, setDrag] = useState(false);
   const [videoInfo, setVideoInfo] = useState<{ url: string; title: string; compressing: boolean } | null>(null);
   const [resumed, setResumed] = useState(false);
+  // FAB raketasi bilan kirganda: sahifa avval xira + bloklangan bo'ladi,
+  // raketa animatsiyasi (2.2s) tugagach silliq tiniqlashadi.
+  const [entering, setEntering] = useState(
+    () => typeof window !== "undefined" && sessionStorage.getItem(UPLOAD_ENTER_KEY) !== null
+  );
+  useEffect(() => {
+    if (!entering) return;
+    try {
+      sessionStorage.removeItem(UPLOAD_ENTER_KEY);
+    } catch {
+      /* ignore */
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setEntering(false);
+      return;
+    }
+    const t = window.setTimeout(() => setEntering(false), 2200);
+    return () => window.clearTimeout(t);
+  }, [entering]);
   const videoInput = useRef<HTMLInputElement>(null);
   const thumbInput = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -306,7 +327,11 @@ export default function UploadPage() {
     );
 
   return (
-    <div className="mx-auto w-full max-w-4xl fade-up">
+    <div
+      className={cn("mx-auto w-full max-w-4xl fade-up upload-enter", entering && "upload-enter-blur")}
+      aria-busy={entering}
+      inert={entering}
+    >
       <h1 className="text-[24px] font-bold tracking-tight">{t("upload.title")}</h1>
       <p className="text-sm text-(--tx3)">{t("upload.subtitle")}</p>
 

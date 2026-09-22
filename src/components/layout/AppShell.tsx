@@ -107,7 +107,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             !adminView && (sidebarOpen ? CONTENT_ML.open : CONTENT_ML.closed)
           )}
         >
-          <main className="mx-auto w-full max-w-[1760px] flex-1 px-4 pb-24 pt-5 md:px-6 md:pb-12">
+          {/* Mobil'da pastki dock (~130px) kontentni bosmasligi uchun pb-40;
+              desktop'da MobileNav yo'q — md:pb-12 yetadi */}
+          <main className="mx-auto w-full max-w-[1760px] flex-1 px-4 pb-40 pt-5 md:px-6 md:pb-12">
             {children}
           </main>
         </div>

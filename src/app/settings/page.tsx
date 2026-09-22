@@ -145,7 +145,7 @@ export default function SettingsPage() {
                 onClick={() => setPending(l.id)}
                 aria-pressed={selected}
                 className={cn(
-                  "flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-200",
+                  "flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-200 active:scale-[0.98]",
                   selected
                     ? "border-[#7c5cff]/50 bg-[#7c5cff]/10"
                     : "border-[rgb(var(--tint)/0.07)] hover:bg-[rgb(var(--tint)/0.05)]"
@@ -156,7 +156,7 @@ export default function SettingsPage() {
                   <span className="block text-[12px] text-(--tx4)">{l.sub}</span>
                 </span>
                 {selected && (
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#7c5cff] text-white">
+                  <span className="pop-in grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#7c5cff] text-white">
                     <Check size={14} />
                   </span>
                 )}

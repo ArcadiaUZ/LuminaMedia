@@ -274,7 +274,7 @@ export function Navbar({ adminView = false }: { adminView?: boolean }) {
                   )}
                 </button>
                 {openMenu === "notif" && (
-                  <div className="glass-pop absolute right-0 top-12 w-[340px] overflow-hidden rounded-2xl">
+                  <div className="glass-pop absolute right-0 top-12 w-[min(calc(100vw-32px),340px)] max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl">
                     <div className="flex items-center justify-between border-b border-[rgb(var(--tint)/0.08)] px-4 py-3">
                       <span className="text-sm font-semibold">{t("nav.notifications")}</span>
                       <button onClick={markRead} className="text-[12px] text-[#9d86ff] hover:text-(--tx1)">
@@ -308,7 +308,7 @@ export function Navbar({ adminView = false }: { adminView?: boolean }) {
                   <Avatar src={user.avatarUrl} name={user.username} size={34} />
                 </button>
                 {openMenu === "user" && (
-                  <div className="glass-pop user-menu absolute right-0 top-12 w-56 rounded-2xl p-1.5">
+                  <div className="glass-pop user-menu absolute right-0 top-12 w-56 max-w-[calc(100vw-32px)] rounded-2xl p-1.5">
                     <div className="mb-1 border-b border-[rgb(var(--tint)/0.08)] px-3 py-2.5">
                       <p className="text-sm font-semibold">@{user.username}</p>
                       <p className="truncate text-[12px] text-(--tx4)">{user.email}</p>

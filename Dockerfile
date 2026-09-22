@@ -20,6 +20,13 @@ ENV NEXT_PUBLIC_APP_NAME=$NEXT_PUBLIC_APP_NAME
 # DB'ga tegadigan prerender bo'lsa build yiqilmasligi uchun dummy URL
 ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public"
 ENV DATABASE_URL=$DATABASE_URL
+# Build-time dummy'lar: `next build` paytida src/lib/admin.ts modul baholashdan
+# o'tishi uchun (prod'da env bo'lmasa throw qiladi). Faqat builder layer'da
+# yashaydi — runtime'da fly secrets'dagi haqiqiy qiymatlar ishlatiladi.
+ARG ADMIN_PASSWORD="build-only-dummy-not-used-at-runtime"
+ENV ADMIN_PASSWORD=$ADMIN_PASSWORD
+ARG JWT_SECRET="build-only-dummy-secret-0123456789abcdef-0123456789abcdef"
+ENV JWT_SECRET=$JWT_SECRET
 RUN npx prisma generate
 RUN npm run build
 

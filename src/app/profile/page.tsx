@@ -61,17 +61,22 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl fade-up">
-      <div className="glass flex items-center gap-4 rounded-3xl p-6">
-        <Avatar src={user.avatarUrl} name={user.username} size={80} />
-        <div className="min-w-0">
-          <h1 className="text-[24px] font-bold tracking-tight">{user.username}</h1>
-          <p className="truncate text-sm text-(--tx3)">{user.email}</p>
-          <Link href={`/channel/${user.channel?.handle}`} className="mt-1 inline-block rounded-full bg-[rgb(var(--tint)/0.07)] px-3 py-1 text-[12.5px] font-medium text-(--tx2) hover:bg-[rgb(var(--tint)/0.12)]">
-            @{user.channel?.handle ?? t('profile.noChannel')}
-          </Link>
+      {/* Mobil'da ustma-ust (avatar + matn + tugma bir qatorda sig'maydi,
+          yozuvlar bir-biriga kiradi) — shuning uchun telefonda column,
+          desktop'da row. Tugma mobil'da to'liq qatorga tushadi. */}
+      <div className="glass flex flex-col gap-4 rounded-3xl p-5 sm:flex-row sm:items-center sm:p-6">
+        <div className="flex min-w-0 flex-1 items-center gap-3.5">
+          <Avatar src={user.avatarUrl} name={user.username} size={72} />
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-[20px] font-bold tracking-tight sm:text-[24px]">{user.username}</h1>
+            <p className="truncate text-sm text-(--tx3)">{user.email}</p>
+            <Link href={`/channel/${user.channel?.handle}`} className="mt-1 inline-block max-w-full truncate rounded-full bg-[rgb(var(--tint)/0.07)] px-3 py-1 text-[12.5px] font-medium text-(--tx2) hover:bg-[rgb(var(--tint)/0.12)]">
+              @{user.channel?.handle ?? t('profile.noChannel')}
+            </Link>
+          </div>
         </div>
         {user.channel && (
-          <Button variant="ghost" size="sm" className="ml-auto" onClick={() => router.push(`/channel/${user.channel?.handle}`)}>
+          <Button variant="ghost" size="sm" className="w-full shrink-0 sm:ml-auto sm:w-auto" onClick={() => router.push(`/channel/${user.channel?.handle}`)}>
             {t('profile.viewChannel')}
           </Button>
         )}

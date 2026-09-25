@@ -10,6 +10,9 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   title: "Lumina — Cinematic Media Platform",
   description: "Watch, create and share cinematic stories. An original premium media platform.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://lumina-media.fly.dev"),
+  openGraph: { title: "Lumina", description: "Watch, create and share cinematic stories.", type: "website" },
+  robots: { index: true, follow: true },
 };
 
 // viewport-fit=cover: mobil brauzer safe-area (home indicator, gesture panel)

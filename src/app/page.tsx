@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useIsoLayoutEffect } from "@/lib/iso-layout";
 import { VideoCard, type CardVideo } from "@/components/video/VideoCard";
-import { VideoCardSkeleton } from "@/components/ui/Skeleton";
+import { HomePageSkeleton } from "@/components/ui/Skeleton";
 import { Chips } from "@/components/ui/Tabs";
 import { EmptyState, ErrorState } from "@/components/ui/States";
 import { CATEGORIES } from "@/lib/constants";
@@ -110,11 +110,7 @@ export default function HomePage() {
       <Chips items={CATEGORIES} active={cat} onChange={setCat} onPrefetch={prefetch} />
 
       {loading && items.length === 0 ? (
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <VideoCardSkeleton key={i} />
-          ))}
-        </div>
+        <HomePageSkeleton />
       ) : error && items.length === 0 ? (
         <div className="mt-5">
           <ErrorState

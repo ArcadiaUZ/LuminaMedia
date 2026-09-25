@@ -6,7 +6,7 @@ import { db } from "./db";
 const JWT_SECRET_RAW = process.env.JWT_SECRET ?? "dev-only-change-me-lumina-32chars-minimum-secret";
 
 if (!process.env.JWT_SECRET) {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== "phase-production-build") {
     throw new Error("[auth] FATAL: JWT_SECRET is not set. Refusing to boot with insecure default.");
   }
   console.warn("[auth] WARNING: JWT_SECRET is not set — using insecure dev default. Set it before going live.");

@@ -1,4 +1,6 @@
-# Lumina Media Platform — Fly.io Dockerfile (multi-stage, Next.js standalone)
+# Lumina Media Platform — production Dockerfile (multi-stage, Next.js standalone)
+# Har qanday serverda ishlaydi: docker compose up --build (Fly.io shart emas).
+# Uploads UPLOAD_DIR env orqali ($PWD/public/uploads default, compose'da /data/uploads).
 # Node 20 LTS (Next 16 talabi: 20.9+). Prisma 6 + ffmpeg-static bilan mos.
 
 # ---- 1) Bog'liqliklar ----
@@ -59,15 +61,14 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Prisma schema/migratsiyalar (migrate deploy uchun)
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
-# Upload'lar: Fly volume /data ga ulanadi, /app/public/uploads esa unga symlink.
-# (Volume ildizidagi root'ga tegishli lost+found Next.js'ni crash qilmasligi uchun —
-# Next faqat /data/uploads ichini ko'radi, u yerda lost+found yo'q)
+# Upload'lar: UPLOAD_DIR (/data/uploads default — compose volume).
+# Eski Fly volume bilan moslik uchun /data/uploads ga symlink ham saqlanadi.
 RUN rm -rf ./public/uploads && mkdir -p /data/uploads \
- && ln -s /data/uploads ./public/uploads \
- && chown -R nextjs:nodejs /app
+  && ln -s /data/uploads ./public/uploads \
+  && chown -R nextjs:nodejs /app
 
 USER nextjs
 EXPOSE 3000
 
-# Har boot'da: uploads papka → migratsiya → server
-CMD ["sh", "-c", "mkdir -p /data/uploads /data/uploads/videos /data/uploads/thumbnails /data/uploads/tmp && ./node_modules/.bin/prisma migrate deploy && node server.js"]
+# Har boot'da: uploads papka (UPLOAD_DIR hurmati) → migratsiya → server
+CMD ["sh", "-c", "U=${UPLOAD_DIR:-/data/uploads}; mkdir -p \"$U\" \"$U/videos\" \"$U/thumbnails\" \"$U/tmp\" && ./node_modules/.bin/prisma migrate deploy && node server.js"]

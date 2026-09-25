@@ -16,7 +16,8 @@ export interface StoredFile {
   mime: string;
 }
 
-const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads");
+const UPLOAD_ROOT =
+  process.env.UPLOAD_DIR?.trim() || path.join(process.cwd(), "public", "uploads");
 
 const ALLOWED_VIDEO_EXTS = new Set([".mp4", ".webm", ".ogg", ".mov", ".mkv"]);
 const ALLOWED_IMAGE_EXTS = new Set([".jpg", ".jpeg", ".png", ".webp"]);

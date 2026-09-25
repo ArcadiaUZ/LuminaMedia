@@ -8,8 +8,10 @@ import { timingSafeEqual } from "crypto";
 export const ADMIN_USERNAME = process.env.ADMIN_USERNAME ?? "admin@example.com";
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "CHANGE-ME-set-ADMIN_PASSWORD-env";
 
+const IS_BUILD = process.env.NEXT_PHASE === "phase-production-build";
+
 if (!process.env.ADMIN_PASSWORD) {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" && !IS_BUILD) {
     throw new Error("[admin] FATAL: ADMIN_PASSWORD is not set. Refusing to boot with default credentials.");
   }
   console.warn(
@@ -19,7 +21,7 @@ if (!process.env.ADMIN_PASSWORD) {
 
 const JWT_SECRET_RAW =
   process.env.JWT_SECRET ?? "dev-only-change-me-lumina-32chars-minimum-secret";
-if (!process.env.JWT_SECRET && process.env.NODE_ENV === "production") {
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === "production" && !IS_BUILD) {
   throw new Error("[admin] FATAL: JWT_SECRET is not set. Refusing to boot with insecure default.");
 }
 const SECRET = new TextEncoder().encode(JWT_SECRET_RAW);

@@ -21,7 +21,9 @@ if (typeof setInterval !== "undefined") {
 }
 
 export function clientIp(req: Request): string {
-  // Spoof'ni kamaytirish uchun: x-forwarded-for dagi faqat birinchi IP, trim qilib.
+  // Fly.io orqasida Fly-Client-IP ishonchli; x-forwarded-for spoof bo'lishi mumkin.
+  const flyIp = req.headers.get("fly-client-ip")?.trim();
+  if (flyIp) return flyIp;
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) {
     const first = fwd.split(",")[0]?.trim();

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { VideoCard, type CardVideo } from "@/components/video/VideoCard";
-import { VideoCardSkeleton } from "@/components/ui/Skeleton";
+import { SubscriptionsPageSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/States";
 import { Avatar } from "@/components/ui/Avatar";
 import { Users } from "lucide-react";
@@ -70,11 +70,7 @@ export default function SubscriptionsPage() {
         </p>
       )}
       {loading ? (
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <VideoCardSkeleton key={i} />
-          ))}
-        </div>
+        <SubscriptionsPageSkeleton />
       ) : videos.length === 0 ? (
         <div className="mt-5">
           <EmptyState icon={Users} title={t('subs.emptyTitle')} hint={t('subs.emptyHint')} action={<Link href="/explore" className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black">{t('subs.exploreBtn')}</Link>} />
